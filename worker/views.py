@@ -1,20 +1,29 @@
-from django.http import JsonResponse
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .tasks import send_to_queue
 
-# Create your views here.
 
+@api_view(["GET"])
 def Home(request):
-    return JsonResponse({
-        "example": "django celery task"
-    })
+    context = {
+        "home": "api worker"
+    }
+    return Response(context)
 
-def CreateTask(request):
 
-    ret = send_to_queue.delay(10)
-    print(ret)
+@api_view(["POST"])
+def queue_worker(request):
+
+    try:
+        count = request.data["count"]
+    except Exception as e:
+        return Response(e)
+
+    ret = send_to_queue.delay(count)
+
     context = {
         "task_id": ret.task_id,
         "url": f"http://localhost:8000/celery-progress/{ret.task_id}"
-    }
 
-    return JsonResponse(context)
+    }
+    return Response(context)
