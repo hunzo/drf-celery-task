@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from .tasks import send_to_queue
 
 
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 def Home(request):
     context = {
         "home": "api worker"
